@@ -9,6 +9,7 @@ export default function CampaignDetails({ tokens, setTokens }) {
 
   const [campaign, setCampaign] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
 
   const userId = Number(localStorage.getItem("userId"));
 
@@ -33,11 +34,13 @@ export default function CampaignDetails({ tokens, setTokens }) {
     return <PageWrapper title="Campaign not found" />;
 
   const vendorId = campaign.vendor_id;
-  const alreadyPaid = localStorage.getItem(
-    `chat_${campaign.id}_paid`
-  );
+  const paidKey = `paid_${userId}_${campaign.id}`;
+  const alreadyPaid = localStorage.getItem(paidKey);
 
   const handleContact = async () => {
+    if (processing) return;
+    setProcessing(true);
+
     const chat = await api("/chats", {
       method: "POST",
       body: JSON.stringify({
@@ -47,6 +50,7 @@ export default function CampaignDetails({ tokens, setTokens }) {
       }),
     });
 
+    // 🔒 Pay only once per campaign
     if (!alreadyPaid) {
       const tokenRes = await api(
         `/tokens/deduct?user_id=${userId}&amount=50`,
@@ -58,10 +62,7 @@ export default function CampaignDetails({ tokens, setTokens }) {
         return;
       }
 
-      localStorage.setItem(
-        `chat_${campaign.id}_paid`,
-        "true"
-      );
+      localStorage.setItem(paidKey, "true");
       setTokens(tokenRes.tokens);
     }
 
@@ -70,23 +71,56 @@ export default function CampaignDetails({ tokens, setTokens }) {
 
   return (
     <PageWrapper title="Campaign Details">
-      <div className="bg-white p-6 rounded-xl shadow max-w-2xl">
-        <h2 className="text-xl font-bold mb-2">
-          {campaign.product_name}
-        </h2>
+      <div className="bg-white p-8 rounded-xl shadow max-w-3xl space-y-6">
 
-        <p className="text-gray-600 mb-4">
-          {campaign.description}
-        </p>
+        {/* HEADER */}
+        <div>
+          <h2 className="text-2xl font-bold">
+            {campaign.product_name}
+          </h2>
+          <p className="text-gray-500 text-sm mt-1">
+            Campaign ID #{campaign.id}
+          </p>
+        </div>
 
-        <button
-          onClick={handleContact}
-          className="bg-blue-600 text-white px-6 py-2 rounded"
-        >
-          {alreadyPaid
-            ? "Open Chat"
-            : "Contact Vendor (50 tokens)"}
-        </button>
+        {/* DESCRIPTION */}
+        <div>
+          <h3 className="font-semibold mb-1">
+            About the Campaign
+          </h3>
+          <p className="text-gray-600">
+            {campaign.description}
+          </p>
+        </div>
+
+        {/* STATUS */}
+        {alreadyPaid && (
+          <div className="bg-green-50 border border-green-200 p-4 rounded text-green-800 text-sm">
+            ✔ You’ve already contacted this vendor.  
+            You can continue the conversation anytime.
+          </div>
+        )}
+
+        {/* CTA */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleContact}
+            disabled={processing}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded disabled:opacity-60"
+          >
+            {processing
+              ? "Opening chat..."
+              : alreadyPaid
+              ? "Open Chat"
+              : "Contact Vendor (50 tokens)"}
+          </button>
+
+          {!alreadyPaid && (
+            <span className="text-sm text-gray-500">
+              Your balance: {tokens} tokens
+            </span>
+          )}
+        </div>
       </div>
     </PageWrapper>
   );

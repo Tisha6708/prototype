@@ -37,3 +37,17 @@ class Message(Base):
     sender_id = Column(Integer, ForeignKey("users.id"))
     text = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class InfluencerProfile(Base):
+    __tablename__ = "influencer_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, unique=True, index=True)
+
+    name = Column(String)
+    niche = Column(String)
+    followers_range = Column(String)
+    engagement = Column(String)
+    bio = Column(Text)
+    availability = Column(String)
+    content_types = Column(String)  # stored as comma-separated

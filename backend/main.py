@@ -133,3 +133,17 @@ def deduct_user_tokens(
         return {"error": "Not enough tokens"}
 
     return {"tokens": result}
+
+# -------- PROFILES --------
+
+@app.get("/profile/{user_id}")
+def get_profile(user_id: int, db: Session = Depends(get_db)):
+    return crud.get_profile(db, user_id)
+
+
+@app.post("/profile")
+def save_profile(
+    profile: schemas.ProfileCreate,
+    db: Session = Depends(get_db)
+):
+    return crud.create_or_update_profile(db, profile)

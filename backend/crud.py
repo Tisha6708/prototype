@@ -133,3 +133,56 @@ def deduct_tokens(db: Session, user_id: int, amount: int):
     db.commit()
     db.refresh(user)
     return user.tokens
+    
+
+def get_profile(db: Session, user_id: int):
+    profile = db.query(models.InfluencerProfile)\
+        .filter(models.InfluencerProfile.user_id == user_id)\
+        .first()
+
+    if not profile:
+        return None
+
+    return {
+        "user_id": profile.user_id,
+        "name": profile.name,
+        "niche": profile.niche,
+        "followers_range": profile.followers_range,
+        "engagement": profile.engagement,
+        "bio": profile.bio,
+        "availability": profile.availability,
+        "content_types": profile.content_types.split(",") if profile.content_types else []
+    }
+
+
+def create_or_update_profile(db: Session, data):
+    profile = db.query(models.InfluencerProfile)\
+        .filter(models.InfluencerProfile.user_id == data.user_id)\
+        .first()
+
+    content_types_str = ",".join(data.content_types)
+
+    if profile:
+        profile.name = data.name
+        profile.niche = data.niche
+        profile.followers_range = data.followers_range
+        profile.engagement = data.engagement
+        profile.bio = data.bio
+        profile.availability = data.availability
+        profile.content_types = content_types_str
+    else:
+        profile = models.InfluencerProfile(
+            user_id=data.user_id,
+            name=data.name,
+            niche=data.niche,
+            followers_range=data.followers_range,
+            engagement=data.engagement,
+            bio=data.bio,
+            availability=data.availability,
+            content_types=content_types_str,
+        )
+        db.add(profile)
+
+    db.commit()
+    db.refresh(profile)
+    return get_profile(db, data.user_id)

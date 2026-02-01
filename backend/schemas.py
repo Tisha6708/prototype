@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import List, Optional
 
 class UserCreate(BaseModel):
     email: str
@@ -34,3 +35,15 @@ class MessageOut(BaseModel):
     class Config:
         orm_mode = True
 
+class ProfileCreate(BaseModel):
+    user_id: int
+    name: str
+    niche: str
+    followers_range: str
+    engagement: str
+    bio: Optional[str] = ""
+    availability: str
+    content_types: List[str]
+
+class ProfileOut(ProfileCreate):
+    pass

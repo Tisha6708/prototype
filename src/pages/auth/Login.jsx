@@ -31,7 +31,7 @@ export default function Login({ setTokens }) {
 
       // 🔹 Redirect based on role
       navigate(
-        res.role === "vendor" ? "/vendor" : "/influencer"
+        res.role === "vendor" ? "/vendor/home" : "/influencer"
       );
     } catch (err) {
       alert("Login failed. Try again.");
