@@ -47,3 +47,30 @@ class ProfileCreate(BaseModel):
 
 class ProfileOut(ProfileCreate):
     pass
+
+# -------- PRODUCTS --------
+class ProductCreate(BaseModel):
+    vendor_id: int
+    product_name: str
+    cost_price: float
+    quantity_available: int
+
+
+class ProductOut(ProductCreate):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# -------- BILLS --------
+class BillCreate(BaseModel):
+    vendor_id: int
+    product_id: int
+    quantity: int
+    selling_price: float
+
+
+class BillOut(BaseModel):
+    total: float
+    profit: float

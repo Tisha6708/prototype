@@ -26,6 +26,7 @@ import CreateCampaign from "./pages/vendor/CreateCampaign";
 import Products from "./pages/vendor/Products";
 import VendorMyChats from "./pages/vendor/MyChats";
 import VendorChat from "./pages/vendor/Chat";
+import Billing from "./pages/vendor/Billing";
 
 /* -------- NAVBARS -------- */
 import InfluencerNavbar from "./components/common/InfluencerNavbar";
@@ -129,6 +130,7 @@ function App() {
         <Route path="/vendor/chat/:id" element={<VendorChat />} />
         <Route path="/vendor/create" element={<CreateCampaign />} />
         <Route path="/vendor/products" element={<Products />} />
+        <Route path="/vendor/billing" element={<Billing />} />
       </Routes>
     </Router>
   );

@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 import models
-
+from sqlalchemy import text
+from schemas import BillCreate
 
 # --------------------
 # USERS
@@ -186,3 +187,56 @@ def create_or_update_profile(db: Session, data):
     db.commit()
     db.refresh(profile)
     return get_profile(db, data.user_id)
+
+
+# -------- PRODUCTS --------
+def create_product(db: Session, data):
+    product = models.Product(**data.dict())
+    db.add(product)
+    db.commit()
+    db.refresh(product)
+    return product
+
+
+def get_products(db: Session, vendor_id: int):
+    return db.query(models.Product).filter(
+        models.Product.vendor_id == vendor_id
+    ).all()
+
+
+# -------- BILLS --------
+def create_bill(db: Session, bill):
+    product = db.query(models.Product).filter(
+        models.Product.id == bill.product_id,
+        models.Product.vendor_id == bill.vendor_id
+    ).first()
+
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    if product.quantity_available < bill.quantity:
+        raise HTTPException(status_code=400, detail="Insufficient stock")
+
+    # 🔑 CORE LOGIC
+    cost_price = product.cost_price           # PER UNIT
+    selling_price = bill.selling_price        # PER UNIT
+
+    profit_per_unit = selling_price - cost_price
+    total_profit = profit_per_unit * bill.quantity
+
+    new_bill = models.Bill(
+        vendor_id=bill.vendor_id,
+        product_id=bill.product_id,
+        quantity=bill.quantity,
+        selling_price=selling_price,
+        cost_price=cost_price,
+        profit=total_profit
+    )
+
+    product.quantity_available -= bill.quantity
+
+    db.add(new_bill)
+    db.commit()
+    db.refresh(new_bill)
+
+    return new_bill

@@ -37,6 +37,10 @@ export default function VendorNavbar() {
           Products
         </NavLink>
 
+        <NavLink to="/vendor/billing" className={linkClass}>
+          Billing
+        </NavLink>
+
         {/* LOGOUT */}
         <button
           onClick={() => {

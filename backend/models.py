@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Float
 from db import Base
+from sqlalchemy.sql import func
 from datetime import datetime
 
 class User(Base):
@@ -51,3 +52,27 @@ class InfluencerProfile(Base):
     bio = Column(Text)
     availability = Column(String)
     content_types = Column(String)  # stored as comma-separated
+
+class Product(Base):
+    __tablename__ = "products"
+
+    id = Column(Integer, primary_key=True)
+    vendor_id = Column(Integer, index=True)
+    product_name = Column(String)
+    cost_price = Column(Float)
+    quantity_available = Column(Integer)
+
+
+class Bill(Base):
+    __tablename__ = "bills"
+
+    id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, index=True)
+    product_id = Column(Integer, ForeignKey("products.id"))
+
+    quantity = Column(Integer)
+
+    cost_price = Column(Float)          # per unit
+    selling_price = Column(Float)       # per unit
+    profit = Column(Float, nullable=False)        
+    created_at = Column(DateTime, default=datetime.utcnow)
