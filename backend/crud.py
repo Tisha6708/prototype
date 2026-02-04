@@ -41,6 +41,21 @@ def deduct_tokens(db: Session, user_id: int, amount: int):
     db.commit()
     return user.tokens
 
+def create_campaign(db: Session, vendor_id: int, product_name: str, description: str):
+    campaign = models.Campaign(
+        vendor_id=vendor_id,
+        product_name=product_name,
+        description=description
+    )
+    db.add(campaign)
+    db.commit()
+    db.refresh(campaign)
+    return campaign
+
+
+def get_all_campaigns(db: Session):
+    return db.query(models.Campaign).all()
+
 # --------------------
 # ANALYTICS → AI ADAPTER
 # --------------------
