@@ -91,6 +91,27 @@ def validate_ai_analytics(data: dict):
         raise HTTPException(status_code=400, detail="No sales data for AI insights")
     if data["revenue"]["total"] < 1000:
         raise HTTPException(status_code=400, detail="Revenue too low for AI insights")
+    
+
+def create_product(db: Session, product):
+    new_product = models.Product(
+        vendor_id=product.vendor_id,
+        product_name=product.product_name,
+        cost_price=product.cost_price,
+        quantity_available=product.quantity_available,
+    )
+    db.add(new_product)
+    db.commit()
+    db.refresh(new_product)
+    return new_product
+
+def get_products(db: Session, vendor_id: int):
+    return (
+        db.query(models.Product)
+        .filter(models.Product.vendor_id == vendor_id)
+        .all()
+    )
+
 
 # --------------------
 # GEMINI AI
