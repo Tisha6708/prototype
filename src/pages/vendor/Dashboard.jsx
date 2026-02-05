@@ -19,9 +19,31 @@ export default function VendorDashboard() {
   const vendorId = Number(localStorage.getItem("userId"));
   const [data, setData] = useState(null);
 
+  // 🔹 AI state
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiInsights, setAiInsights] = useState(null);
+  const [aiError, setAiError] = useState(null);
+
   useEffect(() => {
     api(`/analytics/${vendorId}`).then(setData);
   }, [vendorId]);
+
+  // 🔹 AI button handler
+  const fetchAiInsights = async () => {
+    setAiLoading(true);
+    setAiError(null);
+
+    try {
+      const res = await api(
+        `/analytics/${vendorId}/marketing`
+      );
+      setAiInsights(res.marketing_insights);
+    } catch (e) {
+      setAiError("AI service unavailable. Try again later.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   if (!data) {
     return (
@@ -31,7 +53,6 @@ export default function VendorDashboard() {
     );
   }
 
-  // ✅ SAFE NORMALIZATION
   const sales = data.sales || [];
   const lowStock = data.low_stock || [];
   const kpis = data.kpis || {};
@@ -41,20 +62,95 @@ export default function VendorDashboard() {
       {/* KPI CARDS */}
       <div className="grid md:grid-cols-3 gap-4 mb-6">
         <KPI label="Total Profit" value={`₹${kpis.total_profit || 0}`} />
-        <KPI label="Units Sold" value={kpis.total_units || 0} />
+        <KPI label="Units Sold" value={kpis.total_units_sold || 0} />
         <KPI label="Products Sold" value={kpis.product_count || 0} />
       </div>
+
+      {/* AI SALES ASSISTANCE BUTTON */}
+      <div className="mb-6">
+        <button
+          onClick={fetchAiInsights}
+          disabled={aiLoading}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+        >
+          {aiLoading ? "Analyzing sales..." : "AI Sales Assistance"}
+        </button>
+      </div>
+
+      {/* AI INSIGHTS */}
+      {aiError && (
+        <div className="bg-red-50 p-4 rounded-xl mb-6 text-sm text-red-600">
+          {aiError}
+        </div>
+      )}
+
+      {aiInsights && (
+        <div className="bg-blue-50 p-6 rounded-xl mb-6">
+          <h3 className="font-semibold mb-3">
+            AI Sales Insights
+          </h3>
+
+          <ul className="list-disc pl-5 text-sm mb-4">
+            {aiInsights.key_insights?.map((k, i) => (
+              <li key={i}>{k}</li>
+            ))}
+          </ul>
+
+          <h4 className="font-medium mb-2">Problems</h4>
+          <ul className="list-disc pl-5 text-sm mb-4">
+            {aiInsights.problems?.map((p, i) => (
+              <li key={i}>{p}</li>
+            ))}
+          </ul>
+
+          <h4 className="font-medium mb-2">
+            Recommended Actions
+          </h4>
+          <ul className="space-y-2 text-sm">
+            {aiInsights.recommended_actions?.map(
+              (a, i) => (
+                <li
+                  key={i}
+                  className="border rounded p-3 bg-white"
+                >
+                  <p className="font-semibold">
+                    {a.priority}: {a.action}
+                  </p>
+                  <p className="text-gray-600">
+                    {a.reason}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Track: {a.metric_to_track}
+                  </p>
+                </li>
+              )
+            )}
+          </ul>
+
+          <p className="mt-4 text-sm">
+            <strong>Budget Advice:</strong>{" "}
+            {aiInsights.budget_advice}
+          </p>
+        </div>
+      )}
 
       {/* CHARTS */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* PIE CHART */}
         <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="font-semibold mb-4">Sales Distribution</h3>
+          <h3 className="font-semibold mb-4">
+            Sales Distribution
+          </h3>
 
           {sales.length === 0 ? (
-            <p className="text-sm text-gray-500">No sales data</p>
+            <p className="text-sm text-gray-500">
+              No sales data
+            </p>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer
+              width="100%"
+              height={300}
+            >
               <PieChart>
                 <Pie
                   data={sales}
@@ -63,7 +159,12 @@ export default function VendorDashboard() {
                   outerRadius={120}
                 >
                   {sales.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    <Cell
+                      key={i}
+                      fill={
+                        COLORS[i % COLORS.length]
+                      }
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -74,17 +175,27 @@ export default function VendorDashboard() {
 
         {/* BAR CHART */}
         <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="font-semibold mb-4">Profit by Product</h3>
+          <h3 className="font-semibold mb-4">
+            Profit by Product
+          </h3>
 
           {sales.length === 0 ? (
-            <p className="text-sm text-gray-500">No profit data</p>
+            <p className="text-sm text-gray-500">
+              No profit data
+            </p>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer
+              width="100%"
+              height={300}
+            >
               <BarChart data={sales}>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="profit" fill="#7c3aed" />
+                <Bar
+                  dataKey="profit"
+                  fill="#7c3aed"
+                />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -100,20 +211,11 @@ export default function VendorDashboard() {
           <ul className="text-sm text-red-600 space-y-1">
             {lowStock.map((p) => (
               <li key={p.product_name}>
-                {p.product_name} — {p.quantity_available} left
+                {p.product_name} —{" "}
+                {p.quantity_available} left
               </li>
             ))}
           </ul>
-        </div>
-      )}
-
-      {/* AI INSIGHT */}
-      {data.insight && (
-        <div className="bg-blue-50 p-6 rounded-xl mt-6">
-          <h3 className="font-semibold mb-2">AI Insights</h3>
-          <p className="text-sm whitespace-pre-line text-gray-700">
-            {data.insight}
-          </p>
         </div>
       )}
     </PageWrapper>
@@ -123,7 +225,9 @@ export default function VendorDashboard() {
 function KPI({ label, value }) {
   return (
     <div className="bg-white p-4 rounded-xl shadow text-center">
-      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-sm text-gray-500">
+        {label}
+      </p>
       <p className="text-xl font-bold">{value}</p>
     </div>
   );

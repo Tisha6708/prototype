@@ -2,10 +2,17 @@ from fastapi import FastAPI, Depends, HTTPException
 from dotenv import load_dotenv
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+import google.generativeai as genai
+
 
 # Load environment variables from backend/.env as early as possible
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
+api_key = os.getenv("GEMINI_API_KEY")
+if api_key:
+    genai.configure(api_key=api_key)
+
 from sqlalchemy.orm import Session
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,7 +28,11 @@ from schemas import BillCreate
 # --------------------
 from fastapi import Request
 from fastapi.responses import Response
-
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
+api_key = os.getenv("GEMINI_API_KEY")
+if api_key:
+    genai.configure(api_key=api_key)
 
 models.Base.metadata.create_all(bind=engine)
 
