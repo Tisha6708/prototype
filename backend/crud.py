@@ -113,6 +113,47 @@ def get_products(db: Session, vendor_id: int):
     )
 
 
+def create_bill(db: Session, bill):
+    product = (
+        db.query(models.Product)
+        .filter(models.Product.id == bill.product_id)
+        .first()
+    )
+
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    if product.quantity_available < bill.quantity:
+        raise HTTPException(status_code=400, detail="Insufficient stock")
+
+    total = bill.selling_price * bill.quantity
+    profit = (bill.selling_price - product.cost_price) * bill.quantity
+
+    new_bill = models.Bill(
+        vendor_id=bill.vendor_id,
+        product_id=bill.product_id,
+        quantity=bill.quantity,
+        cost_price=product.cost_price,
+        selling_price=bill.selling_price,
+        profit=profit,
+    )
+
+    product.quantity_available -= bill.quantity
+
+    db.add(new_bill)
+    db.commit()
+    db.refresh(new_bill)
+
+    # CUSTOMER-FACING BILL
+    return {
+        "product_name": product.product_name,
+        "quantity": bill.quantity,
+        "price_per_unit": bill.selling_price,
+        "total": total,
+    }
+
+
+
 # --------------------
 # GEMINI AI
 # --------------------

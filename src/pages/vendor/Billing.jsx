@@ -72,11 +72,6 @@ export default function Billing() {
         {selected && bill.qty && bill.price && (
           <div className="bg-gray-50 p-3 rounded text-sm">
             <p>Total: ₹{bill.qty * bill.price}</p>
-            <p>
-              Profit: ₹
-              {(bill.price - selected.cost_price) *
-                bill.qty}
-            </p>
           </div>
         )}
 
@@ -90,8 +85,12 @@ export default function Billing() {
         {summary && (
           <div className="bg-green-50 p-4 rounded text-sm">
             <p className="font-medium">Bill Generated</p>
-            <p>Total: ₹{summary.total}</p>
-            <p>Profit: ₹{summary.profit}</p>
+            <p>Product: {summary.product_name}</p>
+            <p>Quantity: {summary.quantity}</p>
+            <p>Price per unit: ₹{summary.price_per_unit}</p>
+            <p className="font-semibold">
+              Total: ₹{summary.total}
+            </p>
           </div>
         )}
       </div>

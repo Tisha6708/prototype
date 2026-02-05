@@ -72,5 +72,8 @@ class BillCreate(BaseModel):
 
 
 class BillOut(BaseModel):
+    product_name: str
+    quantity: int
+    price_per_unit: float
     total: float
-    profit: float
+
