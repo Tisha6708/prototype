@@ -5,7 +5,7 @@ import { api } from "../../services/api";
 import InfluencerProfileModal from "../../components/vendor/InfluencerProfileModal";
 
 export default function VendorChat() {
-  const { id } = useParams(); // chatId
+  const { id } = useParams();
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -40,13 +40,13 @@ export default function VendorChat() {
   };
 
   return (
-    <PageWrapper title="Chat">
-      <div className="bg-white rounded-xl shadow h-[70vh] flex flex-col">
+    <PageWrapper title="Chat Conversation">
+      <div className="bg-white border rounded-2xl shadow-sm h-[75vh] flex flex-col w-full max-w-4xl mx-auto">
 
-        {/* 🔹 HEADER */}
-        <div className="border-b px-6 py-4 flex justify-between items-center">
+        {/* HEADER */}
+        <div className="border-b px-6 py-4 flex justify-between items-center gap-4 flex-wrap">
           <div>
-            <p className="font-semibold text-sm">
+            <p className="font-semibold text-gray-900">
               Influencer Conversation
             </p>
             <p className="text-xs text-gray-500">
@@ -57,21 +57,21 @@ export default function VendorChat() {
           {chat && (
             <button
               onClick={() => setShowProfile(true)}
-              className="text-sm bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full border hover:bg-blue-100"
+              className="text-sm bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full border border-blue-200 hover:bg-blue-100 transition"
             >
-              View Influencer Profile
+              View Profile →
             </button>
           )}
         </div>
 
-        {/* 🔹 MESSAGES */}
-        <div className="flex-1 px-6 py-4 space-y-3 overflow-y-auto bg-gray-50">
+        {/* MESSAGES */}
+        <div className="flex-1 px-6 py-5 space-y-3 overflow-y-auto bg-blue-50/40">
           {messages.map((m) => (
             <div
               key={m.id}
               className={`max-w-xs px-4 py-2 text-sm rounded-xl ${
                 m.sender_id === vendorId
-                  ? "bg-purple-600 text-white ml-auto"
+                  ? "bg-blue-600 text-white ml-auto"
                   : "bg-white text-gray-800 border"
               }`}
             >
@@ -80,24 +80,25 @@ export default function VendorChat() {
           ))}
         </div>
 
-        {/* 🔹 INPUT */}
+        {/* INPUT */}
         <div className="border-t px-6 py-4 flex gap-3">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="border p-3 flex-1 rounded-lg text-sm"
+            className="flex-1 border rounded-lg px-4 py-3 text-sm outline-none
+            focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="Type your message…"
           />
+
           <button
             onClick={handleSend}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 rounded-lg text-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg text-sm font-medium transition"
           >
             Send
           </button>
         </div>
       </div>
 
-      {/* 🔹 PROFILE MODAL */}
       {showProfile && chat && (
         <InfluencerProfileModal
           influencerId={chat.influencer_id}

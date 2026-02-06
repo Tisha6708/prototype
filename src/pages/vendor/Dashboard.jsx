@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const COLORS = ["#7c3aed", "#22c55e", "#f97316", "#0ea5e9"];
+const COLORS = ["#2563eb", "#60a5fa", "#93c5fd", "#1d4ed8"];
 
 export default function VendorDashboard() {
   const vendorId = Number(localStorage.getItem("userId"));
@@ -47,8 +47,10 @@ export default function VendorDashboard() {
 
   if (!data) {
     return (
-      <PageWrapper title="Sales Analytics">
-        <p className="text-gray-500">Loading analytics...</p>
+      <PageWrapper title="Analytics Overview">
+        <div className="flex justify-center py-28 text-gray-500">
+          Loading analytics...
+        </div>
       </PageWrapper>
     );
   }
@@ -58,9 +60,12 @@ export default function VendorDashboard() {
   const kpis = data.kpis || {};
 
   return (
-    <PageWrapper title="Sales Analytics">
-      {/* KPI CARDS */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
+    <PageWrapper
+      title="Analytics Dashboard"
+      subtitle="Track campaign performance and product sales"
+    >
+      {/* KPI ROW */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <KPI label="Total Profit" value={`₹${kpis.total_profit || 0}`} />
         <KPI label="Units Sold" value={kpis.total_units_sold || 0} />
         <KPI label="Products Sold" value={kpis.product_count || 0} />
@@ -135,6 +140,10 @@ export default function VendorDashboard() {
       )}
 
       {/* CHARTS */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* PIE */}
+        <div className="bg-white border rounded-2xl p-6 shadow-sm">
+          <h3 className="font-semibold text-gray-900 mb-4">
       <div className="grid md:grid-cols-2 gap-6">
         {/* PIE CHART */}
         <div className="bg-white p-6 rounded-xl shadow">
@@ -147,6 +156,7 @@ export default function VendorDashboard() {
               No sales data
             </p>
           ) : (
+            <ResponsiveContainer width="100%" height={320}>
             <ResponsiveContainer
               width="100%"
               height={300}
@@ -173,6 +183,9 @@ export default function VendorDashboard() {
           )}
         </div>
 
+        {/* BAR */}
+        <div className="bg-white border rounded-2xl p-6 shadow-sm">
+          <h3 className="font-semibold text-gray-900 mb-4">
         {/* BAR CHART */}
         <div className="bg-white p-6 rounded-xl shadow">
           <h3 className="font-semibold mb-4">
@@ -184,6 +197,7 @@ export default function VendorDashboard() {
               No profit data
             </p>
           ) : (
+            <ResponsiveContainer width="100%" height={320}>
             <ResponsiveContainer
               width="100%"
               height={300}
@@ -192,6 +206,7 @@ export default function VendorDashboard() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
+                <Bar dataKey="profit" fill="#2563eb" />
                 <Bar
                   dataKey="profit"
                   fill="#7c3aed"
@@ -204,8 +219,8 @@ export default function VendorDashboard() {
 
       {/* LOW STOCK */}
       {lowStock.length > 0 && (
-        <div className="bg-red-50 p-4 rounded-xl mt-6">
-          <h4 className="font-semibold text-red-700 mb-2">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mt-8">
+          <h4 className="font-semibold text-red-700 mb-3">
             Low Stock Alert
           </h4>
           <ul className="text-sm text-red-600 space-y-1">
@@ -218,12 +233,29 @@ export default function VendorDashboard() {
           </ul>
         </div>
       )}
+
+      {/* AI INSIGHT */}
+      {data.insight && (
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mt-8">
+          <h3 className="font-semibold text-blue-900 mb-2">
+            AI Insights
+          </h3>
+          <p className="text-sm whitespace-pre-line text-gray-700">
+            {data.insight}
+          </p>
+        </div>
+      )}
     </PageWrapper>
   );
 }
 
 function KPI({ label, value }) {
   return (
+    <div className="bg-white border rounded-2xl p-6 shadow-sm">
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-2xl font-semibold text-gray-900 mt-1">
+        {value}
+      </p>
     <div className="bg-white p-4 rounded-xl shadow text-center">
       <p className="text-sm text-gray-500">
         {label}

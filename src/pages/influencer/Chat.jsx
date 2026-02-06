@@ -22,7 +22,6 @@ export default function Chat({ tokens, setTokens }) {
   const paidKey = `chat_paid_blocks_${userId}_${id}`;
   const autoMsgKey = `auto_interest_sent_${userId}_${id}`;
 
-  /* LOAD MESSAGES + AUTO MESSAGE (ONLY ONCE) */
   useEffect(() => {
     const loadMessages = async () => {
       const data = await api(`/messages/${id}`);
@@ -57,7 +56,6 @@ export default function Chat({ tokens, setTokens }) {
     loadMessages();
   }, [id, userId]);
 
-  /* AUTO SCROLL */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -105,48 +103,37 @@ export default function Chat({ tokens, setTokens }) {
   };
 
   return (
-    <PageWrapper>
-      <div className="h-[calc(100vh-64px)] bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 flex flex-col">
+    <PageWrapper title="Conversation">
+      <div className="bg-white border rounded-2xl shadow-sm h-[75vh] flex flex-col max-w-3xl">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center px-6 py-4 border-b border-blue-400/20 bg-slate-900/70 backdrop-blur">
+        <div className="border-b px-6 py-4 flex justify-between items-center">
           <div>
-            <h2 className="text-lg font-semibold text-blue-400">
-              Conversation
+            <h2 className="font-semibold text-gray-900">
+              Chat
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-gray-500">
               {sentCount < FREE_LIMIT
                 ? `${FREE_LIMIT - sentCount} free messages left`
                 : `5 tokens per ${PAID_BLOCK_SIZE} messages`}
             </p>
           </div>
 
-          {/* LIGHTER BLUE TOKENS BADGE */}
-          <div className="
-            bg-blue-500/80
-            text-white
-            px-4 py-1.5
-            rounded-full
-            font-semibold
-            border border-blue-300
-            shadow-[0_0_18px_rgba(96,165,250,0.6)]
-          ">
-            {tokens} Tokens
+          <div className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-sm font-semibold border border-blue-200">
+            {tokens} tokens
           </div>
         </div>
 
         {/* MESSAGES */}
-        <div className="flex-1 px-6 py-4 overflow-y-auto space-y-4">
+        <div className="flex-1 px-6 py-4 overflow-y-auto space-y-3 bg-blue-50/40">
           {messages.map((m) => (
             <div
               key={m.id}
-              className={`max-w-sm px-4 py-2 rounded-2xl text-sm transition-all
-                ${
-                  m.sender_id === userId
-                    ? "ml-auto bg-blue-500 text-white shadow-[0_0_20px_rgba(96,165,250,0.5)]"
-                    : "mr-auto bg-slate-800 text-slate-200 border border-slate-700"
-                }
-              `}
+              className={`max-w-xs px-4 py-2 text-sm rounded-xl ${
+                m.sender_id === userId
+                  ? "ml-auto bg-blue-600 text-white"
+                  : "bg-white border text-gray-800"
+              }`}
             >
               {m.text}
             </div>
@@ -155,41 +142,18 @@ export default function Chat({ tokens, setTokens }) {
         </div>
 
         {/* INPUT */}
-        <div className="px-6 py-4 border-t border-blue-400/20 bg-slate-900/80 backdrop-blur flex gap-3">
+        <div className="border-t px-6 py-4 flex gap-3">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            className="
-              flex-1
-              bg-slate-900
-              border border-blue-500/40
-              rounded-xl
-              px-4 py-2
-              text-slate-200
-
-              shadow-[0_0_18px_rgba(96,165,250,0.35)]
-              transition-all duration-300
-
-              focus:outline-none
-              focus:ring-2 focus:ring-blue-400/70
-              hover:shadow-[0_0_26px_rgba(96,165,250,0.6)]
-            "
+            className="flex-1 border rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
 
           <button
             onClick={handleSend}
             disabled={sending}
-            className="
-              bg-blue-500 hover:bg-blue-600
-              text-white
-              px-6
-              rounded-xl
-              transition
-              active:scale-95
-              disabled:opacity-60
-              shadow-[0_0_20px_rgba(96,165,250,0.6)]
-            "
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg font-medium transition disabled:opacity-60"
           >
             Send
           </button>

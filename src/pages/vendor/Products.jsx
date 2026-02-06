@@ -31,49 +31,87 @@ export default function Products() {
   };
 
   return (
-    <PageWrapper title="Inventory">
-      <div className="bg-white p-6 rounded-xl shadow mb-6 grid grid-cols-3 gap-4">
-        <input
-          placeholder="Product name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          className="border p-2 rounded"
-        />
-        <input
-          placeholder="Cost price"
-          type="number"
-          value={form.cost}
-          onChange={(e) => setForm({ ...form, cost: e.target.value })}
-          className="border p-2 rounded"
-        />
-        <input
-          placeholder="Quantity"
-          type="number"
-          value={form.qty}
-          onChange={(e) => setForm({ ...form, qty: e.target.value })}
-          className="border p-2 rounded"
-        />
+    <PageWrapper
+      title="Inventory"
+      subtitle="Manage your product stock and pricing"
+    >
+      {/* ADD PRODUCT FORM */}
+      <div className="bg-white border rounded-2xl p-6 shadow-sm mb-8">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Add New Product
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          <input
+            placeholder="Product name"
+            value={form.name}
+            onChange={(e) =>
+              setForm({ ...form, name: e.target.value })
+            }
+            className="w-full border rounded-lg px-4 py-3 outline-none
+            focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          />
+
+          <input
+            placeholder="Cost price"
+            type="number"
+            value={form.cost}
+            onChange={(e) =>
+              setForm({ ...form, cost: e.target.value })
+            }
+            className="w-full border rounded-lg px-4 py-3 outline-none
+            focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          />
+
+          <input
+            placeholder="Quantity"
+            type="number"
+            value={form.qty}
+            onChange={(e) =>
+              setForm({ ...form, qty: e.target.value })
+            }
+            className="w-full border rounded-lg px-4 py-3 outline-none
+            focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          />
+        </div>
+
         <button
           onClick={handleAdd}
-          className="col-span-3 bg-purple-600 text-white py-2 rounded"
+          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium shadow-sm transition"
         >
           Add Product
         </button>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        {products.map((p) => (
-          <div key={p.id} className="bg-white p-4 rounded-xl shadow">
-            <h3 className="font-semibold">{p.product_name}</h3>
-            <p className="text-sm text-gray-600">
-              Stock: {p.quantity_available}
-            </p>
-            <p className="text-sm text-gray-600">
-              Cost: ₹{p.cost_price}
-            </p>
-          </div>
-        ))}
-      </div>
+      {/* PRODUCT LIST */}
+      {products.length === 0 ? (
+        <div className="bg-white border rounded-2xl shadow-sm p-12 text-center">
+          <h3 className="text-lg font-semibold mb-2">
+            No products yet
+          </h3>
+          <p className="text-gray-500">
+            Add your first product to start tracking inventory.
+          </p>
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((p) => (
+            <div
+              key={p.id}
+              className="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition"
+            >
+              <h3 className="font-semibold text-gray-900">
+                {p.product_name}
+              </h3>
+
+              <div className="mt-3 space-y-1 text-sm text-gray-600">
+                <p>Stock: {p.quantity_available}</p>
+                <p>Cost: ₹{p.cost_price}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </PageWrapper>
   );
 }

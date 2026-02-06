@@ -24,73 +24,77 @@ export default function VendorHome() {
   return (
     <PageWrapper
       title="My Campaigns"
-      subtitle="Create, monitor, and manage influencer collaborations"
+      subtitle="Create and manage influencer collaborations"
     >
-      {/* TOP BAR */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+      {/* HEADER BAR */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
         <div>
-          <h2 className="text-xl font-semibold">
-            Active Marketing Posts
+          <h2 className="text-xl font-semibold text-gray-900">
+            Active Campaigns
           </h2>
           <p className="text-sm text-gray-500">
-            These campaigns are visible to influencers
+            Campaigns currently visible to influencers
           </p>
         </div>
 
         <button
           onClick={() => navigate("/vendor/create")}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium shadow-sm transition"
         >
           + Create Campaign
         </button>
       </div>
 
-      {/* CONTENT */}
+      {/* LOADING */}
       {loading ? (
-        <div className="flex justify-center py-20 text-gray-500">
+        <div className="flex justify-center py-28 text-gray-500">
           Loading campaigns...
         </div>
       ) : campaigns.length === 0 ? (
-        <div className="bg-white p-12 rounded-xl shadow text-center max-w-lg mx-auto">
-          <h3 className="text-lg font-semibold mb-2">
+        /* EMPTY STATE */
+        <div className="bg-white border rounded-2xl shadow-sm p-14 text-center max-w-xl mx-auto">
+          <div className="text-5xl mb-4">📣</div>
+          <h3 className="text-xl font-semibold mb-2">
             No campaigns yet
           </h3>
           <p className="text-gray-500 mb-6">
-            Start your first influencer marketing campaign to
-            reach creators.
+            Launch your first campaign and start collaborating with influencers.
           </p>
+
           <button
             onClick={() => navigate("/vendor/create")}
-            className="bg-purple-600 text-white px-6 py-3 rounded"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium"
           >
             Create Campaign
           </button>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        /* GRID */
+        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-7">
           {campaigns.map((campaign) => (
             <div
               key={campaign.id}
-              className="bg-white rounded-xl shadow hover:shadow-lg transition p-6 flex flex-col"
+              className="group bg-white border rounded-2xl p-6 shadow-sm hover:shadow-lg transition flex flex-col"
             >
-              {/* CARD HEADER */}
-              <div className="mb-3">
-                <h3 className="font-semibold text-lg">
+              {/* CARD TOP */}
+              <div className="mb-4">
+                <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition">
                   {campaign.product_name}
                 </h3>
-                <span className="inline-block mt-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+
+                <span className="inline-block mt-2 text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md">
                   Active
                 </span>
               </div>
 
               {/* DESCRIPTION */}
-              <p className="text-sm text-gray-600 flex-1">
+              <p className="text-sm text-gray-600 flex-1 leading-relaxed">
                 {campaign.description}
               </p>
 
               {/* FOOTER */}
-              <div className="mt-4 pt-4 border-t flex items-center justify-between text-sm">
-                <span className="text-gray-500">
+              <div className="mt-6 pt-4 border-t flex items-center justify-between">
+                <span className="text-xs text-gray-400">
                   Campaign #{campaign.id}
                 </span>
 
@@ -98,7 +102,7 @@ export default function VendorHome() {
                   onClick={() =>
                     navigate(`/vendor/chat/${campaign.id}`)
                   }
-                  className="text-purple-600 hover:underline"
+                  className="text-blue-600 font-medium text-sm hover:underline"
                 >
                   View Chats →
                 </button>

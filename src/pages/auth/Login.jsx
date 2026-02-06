@@ -14,25 +14,19 @@ export default function Login({ setTokens }) {
     setLoading(true);
 
     try {
-      // 🔹 Prototype login = create or reuse user
       const res = await api("/users", {
         method: "POST",
         body: JSON.stringify({ email, role }),
       });
 
-      // 🔹 Save session
       const userId = res.id;
       localStorage.setItem("userId", userId);
       localStorage.setItem("role", res.role);
 
-      // 🔹 Fetch tokens from backend
       const tokenRes = await api(`/tokens/${userId}`);
       setTokens(tokenRes.tokens);
 
-      // 🔹 Redirect based on role
-      navigate(
-        res.role === "vendor" ? "/vendor/home" : "/influencer"
-      );
+      navigate(res.role === "vendor" ? "/vendor/home" : "/influencer");
     } catch (err) {
       alert("Login failed. Try again.");
     } finally {
@@ -41,49 +35,74 @@ export default function Login({ setTokens }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded-xl shadow w-96 space-y-4"
-      >
-        <h1 className="text-2xl font-bold text-center">Login</h1>
-
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full border p-3 rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        {/* Prototype role selection */}
-        <select
-          className="w-full border p-3 rounded"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      {/* Container */}
+      <div className="w-full max-w-md">
+        {/* Card */}
+        <form
+          onSubmit={handleLogin}
+          className="bg-white shadow-xl rounded-2xl p-6 sm:p-8 space-y-5 border"
         >
-          <option value="influencer">Influencer</option>
-          <option value="vendor">Vendor</option>
-        </select>
+          {/* Header */}
+          <div className="space-y-1 text-center">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
+              Welcome back
+            </h1>
+            <p className="text-sm text-gray-500">
+              Login to continue
+            </p>
+          </div>
 
-        <button
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded disabled:opacity-60"
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
+          {/* Email */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <p className="text-sm text-center">
-          Don’t have an account?{" "}
-          <span
-            className="text-blue-600 cursor-pointer"
-            onClick={() => navigate("/register")}
+          {/* Role */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Role
+            </label>
+            <select
+              className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="influencer">Influencer</option>
+              <option value="vendor">Vendor</option>
+            </select>
+          </div>
+
+          {/* Button */}
+          <button
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Sign up
-          </span>
-        </p>
-      </form>
+            {loading ? "Logging in..." : "Login"}
+          </button>
+
+          {/* Footer */}
+          <p className="text-sm text-center text-gray-600">
+            Don’t have an account?{" "}
+            <span
+              className="text-blue-600 font-medium cursor-pointer hover:underline"
+              onClick={() => navigate("/register")}
+            >
+              Sign up
+            </span>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

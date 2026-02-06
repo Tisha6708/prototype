@@ -36,7 +36,6 @@ export default function CreateCampaign() {
         }),
       });
 
-      // After successful creation, go back to vendor home
       navigate("/vendor/home");
     } catch (err) {
       alert("Failed to create campaign");
@@ -47,69 +46,106 @@ export default function CreateCampaign() {
 
   return (
     <PageWrapper
-      title="Create Marketing Post"
+      title="Create Campaign"
       subtitle="Describe the product you want influencers to promote"
     >
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-xl shadow space-y-5 max-w-3xl"
+        className="bg-white border rounded-2xl shadow-sm p-8 space-y-6 max-w-3xl"
       >
-        <div>
-          <label className="block font-medium mb-1">
+        {/* PRODUCT NAME */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">
             Product Name
           </label>
           <input
-            className="border p-3 w-full rounded"
+            className="w-full border rounded-lg px-4 py-3 outline-none
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            placeholder="e.g. Wireless Headphones"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
             required
           />
         </div>
 
-        <div>
-          <label className="block font-medium mb-1">
-            Description
+        {/* DESCRIPTION */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">
+            Campaign Description
           </label>
           <textarea
-            className="border p-3 w-full rounded"
-            rows={4}
+            rows={5}
+            className="w-full border rounded-lg px-4 py-3 outline-none
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
+            placeholder="Describe what influencers should promote, key highlights, tone, etc."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
           />
         </div>
 
-        <div>
-          <label className="block font-medium mb-2">
-            Upload Images (Preview only)
+        {/* IMAGE UPLOAD */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-gray-700">
+            Upload Images
           </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageChange}
-          />
+
+          <div className="border-2 border-dashed rounded-xl p-6 text-center hover:border-blue-400 transition">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageChange}
+              className="hidden"
+              id="imageUpload"
+            />
+            <label
+              htmlFor="imageUpload"
+              className="cursor-pointer text-sm text-gray-600"
+            >
+              <span className="text-blue-600 font-medium">
+                Click to upload
+              </span>{" "}
+              or drag & drop images
+            </label>
+          </div>
         </div>
 
+        {/* IMAGE PREVIEW */}
         {images.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {images.map((img, i) => (
-              <img
+              <div
                 key={i}
-                src={img.preview}
-                alt="preview"
-                className="h-32 w-full object-cover rounded"
-              />
+                className="border rounded-xl overflow-hidden"
+              >
+                <img
+                  src={img.preview}
+                  alt="preview"
+                  className="h-32 w-full object-cover"
+                />
+              </div>
             ))}
           </div>
         )}
 
-        <button
-          disabled={loading}
-          className="bg-purple-600 text-white px-6 py-3 rounded disabled:opacity-60"
-        >
-          {loading ? "Publishing..." : "Publish Post"}
-        </button>
+        {/* ACTIONS */}
+        <div className="flex items-center justify-end gap-4 pt-4 border-t">
+          <button
+            type="button"
+            onClick={() => navigate("/vendor/home")}
+            className="px-6 py-3 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-50 transition"
+          >
+            Cancel
+          </button>
+
+          <button
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium shadow-sm transition disabled:opacity-60"
+          >
+            {loading ? "Publishing..." : "Publish Campaign"}
+          </button>
+        </div>
       </form>
     </PageWrapper>
   );
