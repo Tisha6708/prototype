@@ -9,12 +9,14 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # Load .env relative to this file to ensure the key is available
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
-# api_key = os.getenv("GEMINI_API_KEY")
-# if not api_key:
-#     raise RuntimeError("GEMINI_API_KEY not found in environment")
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise RuntimeError("GEMINI_API_KEY not found in environment")
 
-# genai.configure(api_key=api_key)
+genai.configure(api_key=api_key)
 
 
 # --------------------

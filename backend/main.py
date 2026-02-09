@@ -15,12 +15,8 @@ from db import engine, SessionLocal
 # --------------------
 # ENV SETUP
 # --------------------
-# BASE_DIR = Path(__file__).resolve().parent
-# load_dotenv(BASE_DIR / ".env")
-
-# api_key = os.getenv("GEMINI_API_KEY")
-# if api_key:
-#     genai.configure(api_key=api_key)
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
 # --------------------
 # DB + APP SETUP
