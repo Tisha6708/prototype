@@ -64,16 +64,24 @@ class ProductOut(ProductCreate):
 
 
 # -------- BILLS --------
-class BillCreate(BaseModel):
-    vendor_id: int
+class BillItemCreate(BaseModel):
     product_id: int
     quantity: int
     selling_price: float
 
+class BillCreate(BaseModel):
+    vendor_id: int
+    items: List[BillItemCreate]
 
-class BillOut(BaseModel):
+class BillItemOut(BaseModel):
     product_name: str
     quantity: int
     price_per_unit: float
     total: float
+
+
+class BillOut(BaseModel):
+    items: List[BillItemOut]
+    grand_total: float
+    total_profit: float
 

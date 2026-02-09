@@ -10,11 +10,11 @@ from pathlib import Path
 
 # Load .env relative to this file to ensure the key is available
 
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    raise RuntimeError("GEMINI_API_KEY not found in environment")
+# api_key = os.getenv("GEMINI_API_KEY")
+# if not api_key:
+#     raise RuntimeError("GEMINI_API_KEY not found in environment")
 
-genai.configure(api_key=api_key)
+# genai.configure(api_key=api_key)
 
 
 # --------------------
@@ -196,43 +196,65 @@ def get_products(db: Session, vendor_id: int):
 
 
 def create_bill(db: Session, bill):
-    product = (
-        db.query(models.Product)
-        .filter(models.Product.id == bill.product_id)
-        .first()
-    )
+    total_amount = 0
+    total_profit = 0
+    bill_items = []
 
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+    for item in bill.items:
+        product = (
+            db.query(models.Product)
+            .filter(models.Product.id == item.product_id)
+            .first()
+        )
 
-    if product.quantity_available < bill.quantity:
-        raise HTTPException(status_code=400, detail="Insufficient stock")
+        if not product:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Product {item.product_id} not found"
+            )
 
-    total = bill.selling_price * bill.quantity
-    profit = (bill.selling_price - product.cost_price) * bill.quantity
+        if product.quantity_available < item.quantity:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Insufficient stock for {product.product_name}"
+            )
 
-    new_bill = models.Bill(
-        vendor_id=bill.vendor_id,
-        product_id=bill.product_id,
-        quantity=bill.quantity,
-        cost_price=product.cost_price,
-        selling_price=bill.selling_price,
-        profit=profit,
-    )
+        item_total = item.selling_price * item.quantity
+        item_profit = (
+            item.selling_price - product.cost_price
+        ) * item.quantity
 
-    product.quantity_available -= bill.quantity
+        product.quantity_available -= item.quantity
 
-    db.add(new_bill)
+        bill_item = models.Bill(
+            vendor_id=bill.vendor_id,
+            product_id=item.product_id,
+            quantity=item.quantity,
+            cost_price=product.cost_price,
+            selling_price=item.selling_price,
+            profit=item_profit,
+        )
+
+        total_amount += item_total
+        total_profit += item_profit
+
+        bill_items.append({
+            "product_name": product.product_name,
+            "quantity": item.quantity,
+            "price_per_unit": item.selling_price,
+            "total": item_total
+        })
+
+        db.add(bill_item)
+
     db.commit()
-    db.refresh(new_bill)
 
-    # CUSTOMER-FACING BILL
     return {
-        "product_name": product.product_name,
-        "quantity": bill.quantity,
-        "price_per_unit": bill.selling_price,
-        "total": total,
+        "items": bill_items,
+        "grand_total": total_amount,
+        "total_profit": total_profit
     }
+
 
 
 

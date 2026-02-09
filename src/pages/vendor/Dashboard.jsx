@@ -13,32 +13,26 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const COLORS = ["#2563eb", "#60a5fa", "#93c5fd", "#1d4ed8"];
+/* Multicolor palette for charts */
+const COLORS = [
+  "#6366f1",
+  "#22c55e",
+  "#f59e0b",
+  "#ef4444",
+  "#06b6d4",
+  "#a855f7",
+  "#14b8a6",
+  "#f43f5e",
+];
 
 export default function VendorDashboard() {
   const vendorId = Number(localStorage.getItem("userId"));
   const [data, setData] = useState(null);
 
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiInsights, setAiInsights] = useState(null);
-  const [aiError, setAiError] = useState(null);
-
   useEffect(() => {
+    if (!vendorId) return;
     api(`/analytics/${vendorId}`).then(setData);
   }, [vendorId]);
-
-  const fetchAiInsights = async () => {
-    setAiLoading(true);
-    setAiError(null);
-    try {
-      const res = await api(`/analytics/${vendorId}/marketing`);
-      setAiInsights(res.marketing_insights);
-    } catch {
-      setAiError("AI service unavailable. Try again later.");
-    } finally {
-      setAiLoading(false);
-    }
-  };
 
   if (!data) {
     return (
@@ -57,82 +51,35 @@ export default function VendorDashboard() {
   return (
     <PageWrapper
       title="Analytics Dashboard"
-      subtitle="Track campaign performance and product sales"
+      subtitle="Track sales performance and inventory health"
     >
-      {/* KPIs */}
+      {/* KPI */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <KPI label="Total Profit" value={`₹${kpis.total_profit || 0}`} />
-        <KPI label="Units Sold" value={kpis.total_units_sold || 0} />
+        <KPI label="Units Sold" value={kpis.total_units || 0} />
         <KPI label="Products Sold" value={kpis.product_count || 0} />
       </div>
 
-      {/* AI Button */}
-      <div className="mb-6">
-        <button
-          onClick={fetchAiInsights}
-          disabled={aiLoading}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-        >
-          {aiLoading ? "Analyzing sales..." : "AI Sales Assistance"}
-        </button>
-      </div>
-
-      {/* AI Insights */}
-      {aiError && (
-        <div className="bg-red-50 p-4 rounded-xl mb-6 text-sm text-red-600">
-          {aiError}
-        </div>
-      )}
-
-      {aiInsights && (
-        <div className="bg-blue-50 p-6 rounded-xl mb-6">
-          <h3 className="font-semibold mb-3">AI Sales Insights</h3>
-
-          <ul className="list-disc pl-5 text-sm mb-4">
-            {aiInsights.key_insights?.map((k, i) => (
-              <li key={i}>{k}</li>
-            ))}
-          </ul>
-
-          <h4 className="font-medium mb-2">Problems</h4>
-          <ul className="list-disc pl-5 text-sm mb-4">
-            {aiInsights.problems?.map((p, i) => (
-              <li key={i}>{p}</li>
-            ))}
-          </ul>
-
-          <h4 className="font-medium mb-2">Recommended Actions</h4>
-          <ul className="space-y-2 text-sm">
-            {aiInsights.recommended_actions?.map((a, i) => (
-              <li key={i} className="border rounded p-3 bg-white">
-                <p className="font-semibold">
-                  {a.priority}: {a.action}
-                </p>
-                <p className="text-gray-600">{a.reason}</p>
-                <p className="text-xs text-gray-500">
-                  Track: {a.metric_to_track}
-                </p>
-              </li>
-            ))}
-          </ul>
-
-          <p className="mt-4 text-sm">
-            <strong>Budget Advice:</strong> {aiInsights.budget_advice}
-          </p>
-        </div>
-      )}
-
-      {/* Charts */}
+      {/* CHARTS */}
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Pie */}
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="font-semibold mb-4">Sales Distribution</h3>
+        {/* PIE */}
+        <div className="bg-white border rounded-2xl p-6 shadow-sm">
+          <h3 className="font-semibold text-gray-900 mb-4">
+            Sales Distribution
+          </h3>
+
           {sales.length === 0 ? (
             <p className="text-sm text-gray-500">No sales data</p>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={320}>
               <PieChart>
-                <Pie data={sales} dataKey="quantity" nameKey="name">
+                <Pie
+                  data={sales}
+                  dataKey="quantity"
+                  nameKey="name"
+                  outerRadius={120}
+                  label
+                >
                   {sales.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
@@ -143,28 +90,35 @@ export default function VendorDashboard() {
           )}
         </div>
 
-        {/* Bar */}
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="font-semibold mb-4">Profit by Product</h3>
+        {/* BAR */}
+        <div className="bg-white border rounded-2xl p-6 shadow-sm">
+          <h3 className="font-semibold text-gray-900 mb-4">
+            Profit by Product
+          </h3>
+
           {sales.length === 0 ? (
             <p className="text-sm text-gray-500">No profit data</p>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={320}>
               <BarChart data={sales}>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="profit" fill="#2563eb" />
+                <Bar dataKey="profit">
+                  {sales.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           )}
         </div>
       </div>
 
-      {/* Low stock */}
+      {/* LOW STOCK */}
       {lowStock.length > 0 && (
-        <div className="bg-red-50 p-6 rounded-xl mt-8">
-          <h4 className="font-semibold text-red-700 mb-2">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mt-8">
+          <h4 className="font-semibold text-red-700 mb-3">
             Low Stock Alert
           </h4>
           <ul className="text-sm text-red-600 space-y-1">
@@ -176,13 +130,35 @@ export default function VendorDashboard() {
           </ul>
         </div>
       )}
+
+      {/* AI INSIGHTS */}
+      {data.insight && (
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mt-8">
+          <h3 className="font-semibold text-blue-900 mb-2">
+            AI Insights
+          </h3>
+          <p className="text-sm whitespace-pre-line text-gray-700">
+            {data.insight}
+          </p>
+        </div>
+      )}
+
+      {/* CTA */}
+      <div className="flex justify-center mt-10 gap-10.5">
+        <button className="bg-blue-600 hover:bg-blue-700 transition text-white px-7 py-3 rounded-xl font-semibold shadow-sm">
+          Get Marketing Assistance
+        </button>
+        <button className="bg-blue-600 hover:bg-blue-700 transition text-white px-7 py-3 rounded-xl font-semibold shadow-sm">
+          Get AI Assistance
+        </button>
+      </div>
     </PageWrapper>
   );
 }
 
 function KPI({ label, value }) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow text-center">
+    <div className="bg-white border rounded-2xl p-6 shadow-sm">
       <p className="text-sm text-gray-500">{label}</p>
       <p className="text-2xl font-semibold text-gray-900 mt-1">
         {value}
